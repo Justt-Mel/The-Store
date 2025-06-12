@@ -4,7 +4,8 @@ app.use(express.json())
 const {
     client,
     seed
-} = require('./storeDb');
+} = require('./storeDb')
+app.use ('/api', require ('./api'))
 
 const init = async () =>{
     await client.connect();
