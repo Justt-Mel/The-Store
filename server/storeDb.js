@@ -41,6 +41,22 @@ const fetchCustomer = async () => {
     return response.rows[0]
 }
 
+const createFavorite = async (favorite) =>{
+    const SQL = `
+    INSERT INTO favorite_prod (id, customers_id, products_id)
+    VALUES ($1,$2,$3)
+    RETURNING *
+    `
+    const response = await client.query(SQL, [uuidv4(),favorite.customers_id, favorite.products_id])
+}
+
+const fetchFavorite = async () => {
+    const SQL = `
+    SELECT *
+    FROM favorite_prod
+    `
+}
+
 const seed = async () => {
     const SQL = `
     DROP TABLE IF EXISTS favorite_prod;
@@ -67,12 +83,16 @@ const seed = async () => {
     await client.query(SQL)
     console.log("Tables Created")
 
-     await Promise.all([
+    const [rtx5070] = await Promise.all([
         newProduct({product_name:'rtx5070', product_price: 700, product_quanity: 0})
     ])
 
-    await Promise.all([
+   const [David] = await Promise.all([
         newCustomer({customer_name:'David'})
+    ])
+
+    await Promise.all([
+        createFavorite({customers_id: David.id , products_id: rtx5070.id})
     ])
 }
 
