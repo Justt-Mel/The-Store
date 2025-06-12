@@ -13,6 +13,34 @@ const newProduct = async (product) => {
     return response.rows[0]
 }
 
+const fetchProduct = async () => {
+    const SQL = `
+    SELECT *
+    FROM products
+    `
+    const response = await client.query(SQL)
+    return response.rows[0]
+}
+
+const newCustomer = async (customer) => {
+    const SQL = `
+    INSERT INTO customers (id, customer_name)
+    VALUES ($1,$2)
+    RETURNING *
+    `
+    const response = await client.query(SQL, [uuidv4(), customer.customer_name])
+    return response.rows[0]
+}
+
+const fetchCustomer = async () => {
+    const SQL = `
+    SELECT *
+    FROM customers
+    `
+    const response = await client.query(SQL)
+    return response.rows[0]
+}
+
 const seed = async () => {
     const SQL = `
     DROP TABLE IF EXISTS favorite_prod;
@@ -31,8 +59,9 @@ const seed = async () => {
     CREATE TABLE favorite_prod(
     id UUID PRIMARY KEY,
     customers_id UUID REFERENCES customers(id) NOT NULL, 
-    product_id UUID REFERENCES products(id) NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
+    products_id UUID REFERENCES products(id) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT product_and_customer_id UNIQUE (products_id, customers_id)
     );
     `
     await client.query(SQL)
@@ -40,6 +69,10 @@ const seed = async () => {
 
      await Promise.all([
         newProduct({product_name:'rtx5070', product_price: 700, product_quanity: 0})
+    ])
+
+    await Promise.all([
+        newCustomer({customer_name:'David'})
     ])
 }
 
