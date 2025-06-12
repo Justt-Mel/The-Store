@@ -24,11 +24,11 @@ const fetchProduct = async () => {
 
 const newCustomer = async (customer) => {
     const SQL = `
-    INSERT INTO customers (id, customer_name)
-    VALUES ($1,$2)
+    INSERT INTO customers (id, customer_name,customer_password)
+    VALUES ($1,$2,$3)
     RETURNING *
     `
-    const response = await client.query(SQL, [uuidv4(), customer.customer_name])
+    const response = await client.query(SQL, [uuidv4(), customer.customer_name, customer.customer_password])
     return response.rows[0]
 }
 
@@ -41,7 +41,7 @@ const fetchCustomer = async () => {
     return response.rows[0]
 }
 
-const createFavorite = async (favorite) =>{
+const newFavorite = async (favorite) =>{
     const SQL = `
     INSERT INTO favorite_prod (id, customers_id, products_id)
     VALUES ($1,$2,$3)
@@ -57,6 +57,14 @@ const fetchFavorite = async () => {
     `
 }
 
+const deleteFavorite = async (id) => {
+    const SQL = `
+    DELETE FROM favorite_prod
+    WHERE id = $1
+    `
+    await client.query(SQL,[id])
+}
+
 const seed = async () => {
     const SQL = `
     DROP TABLE IF EXISTS favorite_prod;
@@ -70,7 +78,8 @@ const seed = async () => {
     );
     CREATE TABLE customers(
     id UUID PRIMARY KEY,
-    customer_name VARCHAR(50) UNIQUE
+    customer_name VARCHAR(50) UNIQUE NOT NULL,
+    customer_password VARCHAR(50) NOT NULL
     );
     CREATE TABLE favorite_prod(
     id UUID PRIMARY KEY,
@@ -88,15 +97,22 @@ const seed = async () => {
     ])
 
    const [David] = await Promise.all([
-        newCustomer({customer_name:'David'})
+        newCustomer({customer_name:'David', customer_password: '1234hey'})
     ])
 
     await Promise.all([
-        createFavorite({customers_id: David.id , products_id: rtx5070.id})
+        newFavorite({customers_id: David.id , products_id: rtx5070.id})
     ])
 }
 
 module.exports = {
     client,
-    seed
+    seed,
+    newCustomer,
+    fetchCustomer,
+    newProduct,
+    fetchProduct,
+    newFavorite,
+    fetchFavorite,
+    deleteFavorite
 };
