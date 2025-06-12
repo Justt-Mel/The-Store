@@ -77,12 +77,12 @@ const fetchFavorite = async () => {
     return response.rows
 };
 
-const deleteFavorite = async (id, customers_id) => {
+const deleteFavorite = async (delFave) => {
     const SQL = `
     DELETE FROM favorite_prod
     WHERE id = $1 and customers_id = $2
     `
-    await client.query(SQL,[id, customers_id])
+    await client.query(SQL,[delFave.id, delFave.customers_id])
 };
 
 const seed = async () => {
