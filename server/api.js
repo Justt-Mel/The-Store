@@ -77,7 +77,7 @@ app.get('/customers/:id/favorite', async (req, res, next) => {
 
 app.delete('/favorite/:id/customers/:customers_id',async ( req, res, next) => {
     try {
-        await deleteFavorite(req.params.id)
+        await deleteFavorite({id: req.params.id, customers_id: req.params.customers_id})
         res.sendStatus(201)
     } catch (error) {
         next(error)
