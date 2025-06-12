@@ -12,7 +12,7 @@ const newProduct = async (product) => {
     `
     const response = await client.query(SQL,[uuidv4(),product.product_name, product.product_price, product.product_quanity])
     return response.rows[0]
-}
+};
 
 const fetchProduct = async () => {
     const SQL = `
@@ -21,7 +21,7 @@ const fetchProduct = async () => {
     `
     const response = await client.query(SQL)
     return response.rows
-}
+};
 
 const newCustomer = async (customer) => {
     if (!customer.customer_name.trim() || !customer.customer_password.trim()){
@@ -37,7 +37,7 @@ const newCustomer = async (customer) => {
     `
     const response = await client.query(SQL, [uuidv4(), customer.customer_name, customer.customer_password])
     return response.rows[0]
-}
+};
 
 const fetchCustomer = async () => {
     const SQL = `
@@ -46,7 +46,17 @@ const fetchCustomer = async () => {
     `
     const response = await client.query(SQL)
     return response.rows
-}
+};
+
+const fetchCustFaves = async (customers_id) => {
+    const SQL= `
+    SELECT *
+    FROM favorite_prod
+    WHERE customers_id = $1
+    `
+    const response = await client.query(SQL, [customers_id])
+    return response.rows
+};
 
 const newFavorite = async (favorite) =>{
     const SQL = `
@@ -56,7 +66,7 @@ const newFavorite = async (favorite) =>{
     `
     const response = await client.query(SQL, [uuidv4(), favorite.customers_id, favorite.products_id])
     response.rows[0]
-}
+};
 
 const fetchFavorite = async () => {
     const SQL = `
@@ -65,15 +75,15 @@ const fetchFavorite = async () => {
     `
     const response = await client.query(SQL)
     return response.rows
-}
+};
 
-const deleteFavorite = async (delFave) => {
+const deleteFavorite = async (id, customers_id) => {
     const SQL = `
     DELETE FROM favorite_prod
     WHERE id = $1 and customers_id = $2
     `
-    await client.query(SQL,[delFave.id, delFave.customers_id])
-}
+    await client.query(SQL,[id, customers_id])
+};
 
 const seed = async () => {
     const SQL = `
@@ -120,9 +130,10 @@ const seed = async () => {
         newFavorite({customers_id: David.id , products_id: rtx5070.id}),
         newFavorite({customers_id: Cyrus.id , products_id: headphones.id}),
         newFavorite({customers_id: Gabe.id , products_id: keyboard.id}),
+         newFavorite({customers_id: David.id , products_id: headphones.id}),
         newFavorite({customers_id: Houston.id , products_id: powerbank.id})
     ])
-}
+};
 
 module.exports = {
     client,
@@ -133,5 +144,6 @@ module.exports = {
     fetchProduct,
     newFavorite,
     fetchFavorite,
-    deleteFavorite
+    deleteFavorite,
+    fetchCustFaves
 };

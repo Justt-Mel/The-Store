@@ -7,7 +7,8 @@ const {
     fetchProduct,
     newFavorite,
     fetchFavorite,
-    deleteFavorite
+    deleteFavorite,
+    fetchCustFaves
 } = require('./storeDb')
 
 app.get('/customers',async ( req, res, next) => {
@@ -66,9 +67,17 @@ app.post('/favorite',async ( req, res, next) => {
     }
 })
 
+app.get('/customers/:id/favorite', async (req, res, next) => {
+    try {
+        res.send(await fetchCustFaves(req.params.id))
+    } catch (error) {
+        next(error)
+    }
+})
+
 app.delete('/favorite/:id/customers/:customers_id',async ( req, res, next) => {
     try {
-        await deleteFavorite()
+        await deleteFavorite(req.params.id)
         res.sendStatus(201)
     } catch (error) {
         next(error)
